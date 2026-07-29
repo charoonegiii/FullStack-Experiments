@@ -1,0 +1,23 @@
+:root{--bg:#fff4f8;--card:#fff;--p:#ff6fa8;--b:#ffd4e5}
+body{margin:0;background:linear-gradient(#fff4f8,#ffe8f1);font-family:Arial}
+.container,.app{max-width:1200px;margin:auto;padding:24px}
+.card{background:#fff;border:2px solid var(--b);border-radius:24px;padding:20px;box-shadow:0 8px 24px rgba(255,111,168,.15)}
+button{background:linear-gradient(135deg,#ff8cbc,#ff5d9e);color:#fff;border:none;border-radius:14px;padding:12px 20px}
+input,select,textarea{border:2px solid var(--b);border-radius:14px;padding:12px}
+h1,h2{color:#d63384}
+/* Existing Posts */
+.existing-posts,
+.existing-posts * {
+    color: #222 !important;
+}
+
+/* Search input */
+.existing-posts input,
+.existing-posts select {
+    color: #222 !important;
+}
+
+/* Placeholder */
+.existing-posts input::placeholder {
+    color: #777;
+}
