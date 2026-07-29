@@ -3,14 +3,11 @@ import { useDispatch } from 'react-redux';
 import { postDeleted } from '../features/posts/postsSlice';
 import { startEditingPost } from '../features/ui/uiSlice';
 
-// React.memo: this row only re-renders if its own post/platformName props
-// change — typing in a search box or editing a different post won't
-// re-render every other row, as long as parents pass stable references.
 function PostRow({ post, platformName }) {
   const dispatch = useDispatch();
 
   return (
-    <div style={styles.row}>
+    <div style={styles.card}>
       <button
         style={styles.titleBtn}
         onClick={() => dispatch(startEditingPost(post.id))}
@@ -18,8 +15,19 @@ function PostRow({ post, platformName }) {
         {post.title}
       </button>
 
-      <span style={styles.tag}>{platformName}</span>
-      <span style={styles.tag}>{post.status}</span>
+      <p style={styles.content}>
+        {post.content || "No content available"}
+      </p>
+
+      <div style={styles.infoRow}>
+        <span style={styles.tag}>
+          <strong>Platform:</strong> {platformName}
+        </span>
+
+        <span style={styles.tag}>
+          <strong>Status:</strong> {post.status}
+        </span>
+      </div>
 
       <button
         style={styles.deleteBtn}
@@ -32,28 +40,39 @@ function PostRow({ post, platformName }) {
 }
 
 const styles = {
-  row: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    padding: '12px 0',
+  card: {
     borderBottom: '1px solid #eee',
+    padding: '14px 0',
   },
 
   titleBtn: {
-    flex: 1,
-    textAlign: 'left',
     background: 'none',
     border: 'none',
-    color: '#000',          // <-- Makes the title black
+    color: '#000',
     fontWeight: 700,
-    fontSize: 15,
+    fontSize: 16,
     cursor: 'pointer',
     padding: 0,
+    marginBottom: 8,
+    textAlign: 'left',
+  },
+
+  content: {
+    color: '#555',
+    fontSize: 14,
+    lineHeight: 1.5,
+    margin: '0 0 10px 0',
+    whiteSpace: 'pre-wrap',
+  },
+
+  infoRow: {
+    display: 'flex',
+    gap: 20,
+    marginBottom: 10,
+    fontSize: 13,
   },
 
   tag: {
-    fontSize: 13,
     color: '#555',
   },
 

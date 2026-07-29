@@ -9,8 +9,7 @@ export default function PostForm() {
   const dispatch = useDispatch();
   const platforms = useSelector(selectAllPlatforms);
 
-  // editingPostId lives in the UI slice (not the posts slice) — it's a UI
-  // concern ("what is the user currently doing"), not domain data.
+  // editingPostId lives in the UI slice (not the posts slice)
   const editingPostId = useSelector(selectEditingPostId);
   const editingPost = useSelector((state) =>
     editingPostId ? selectPostById(state, editingPostId) : undefined
@@ -18,6 +17,7 @@ export default function PostForm() {
   const isEditing = Boolean(editingPost);
 
   const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [platformId, setPlatformId] = useState(platforms[0]?.id ?? '');
   const [status, setStatus] = useState('draft');
 
@@ -25,10 +25,12 @@ export default function PostForm() {
   useEffect(() => {
     if (editingPost) {
       setTitle(editingPost.title);
+      setContent(editingPost.content || '');
       setPlatformId(editingPost.platformId);
       setStatus(editingPost.status);
     } else {
       setTitle('');
+      setContent('');
       setPlatformId(platforms[0]?.id ?? '');
       setStatus('draft');
     }
@@ -36,14 +38,35 @@ export default function PostForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!title.trim() || !platformId) return;
 
     if (isEditing) {
-      dispatch(postUpdated({ id: editingPostId, changes: { title, platformId, status } }));
+      dispatch(
+        postUpdated({
+          id: editingPostId,
+          changes: {
+            title,
+            content,
+            platformId,
+            status,
+          },
+        })
+      );
+
       dispatch(stopEditingPost());
     } else {
-      dispatch(postAdded({ title, platformId, status }));
+      dispatch(
+        postAdded({
+          title,
+          content,
+          platformId,
+          status,
+        })
+      );
+
       setTitle('');
+      setContent('');
     }
   };
 
@@ -53,7 +76,9 @@ export default function PostForm() {
 
   return (
     <form onSubmit={handleSubmit} style={styles.card}>
-      <h3 style={styles.heading}>{isEditing ? 'Edit Post' : 'Add Post'}</h3>
+      <h3 style={styles.heading}>
+        {isEditing ? 'Edit Post' : 'Add Post'}
+      </h3>
 
       <label style={styles.label}>Title</label>
       <input
@@ -64,8 +89,20 @@ export default function PostForm() {
         placeholder="Post title"
       />
 
+      <label style={styles.label}>Content</label>
+      <textarea
+        style={styles.textarea}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Write your post..."
+      />
+
       <label style={styles.label}>Platform</label>
-      <select style={styles.input} value={platformId} onChange={(e) => setPlatformId(e.target.value)}>
+      <select
+        style={styles.input}
+        value={platformId}
+        onChange={(e) => setPlatformId(e.target.value)}
+      >
         {platforms.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
@@ -74,17 +111,26 @@ export default function PostForm() {
       </select>
 
       <label style={styles.label}>Status</label>
-      <select style={styles.input} value={status} onChange={(e) => setStatus(e.target.value)}>
+      <select
+        style={styles.input}
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+      >
         <option value="draft">draft</option>
         <option value="published">published</option>
       </select>
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
         <button type="submit" style={styles.primaryBtn}>
           {isEditing ? 'Save Changes' : 'Add Post'}
         </button>
+
         {isEditing && (
-          <button type="button" onClick={handleCancel} style={styles.secondaryBtn}>
+          <button
+            type="button"
+            onClick={handleCancel}
+            style={styles.secondaryBtn}
+          >
             Cancel
           </button>
         )}
@@ -101,8 +147,20 @@ const styles = {
     padding: 20,
     width: 300,
   },
-  heading: { marginTop: 0, marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6, marginTop: 12 },
+
+  heading: {
+    marginTop: 0,
+    marginBottom: 16,
+  },
+
+  label: {
+    display: 'block',
+    fontSize: 13,
+    fontWeight: 600,
+    marginBottom: 6,
+    marginTop: 12,
+  },
+
   input: {
     width: '100%',
     padding: '8px 10px',
@@ -111,6 +169,19 @@ const styles = {
     fontSize: 14,
     boxSizing: 'border-box',
   },
+
+  textarea: {
+    width: '100%',
+    minHeight: 100,
+    padding: '8px 10px',
+    borderRadius: 8,
+    border: '1px solid #ccc',
+    fontSize: 14,
+    resize: 'vertical',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+  },
+
   primaryBtn: {
     background: '#2563eb',
     color: '#fff',
@@ -120,6 +191,7 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
   },
+
   secondaryBtn: {
     background: '#eee',
     color: '#333',
